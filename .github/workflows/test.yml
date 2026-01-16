@@ -22,18 +22,15 @@ jobs:
     - name: Install uv
       run: curl -LsSf https://astral.sh/uv/install.sh | sh
     
-    - name: Add uv to PATH
-      run: echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-    
     - name: Install dependencies
       run: |
-        cd $GITHUB_WORKSPACE
-        uv sync
+        export PATH="$HOME/.local/bin:$PATH"
+        uv sync --all-extras
     
     - name: Run tests
       env:
         GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
       run: |
-        cd $GITHUB_WORKSPACE
+        export PATH="$HOME/.local/bin:$PATH"
         uv run pytest tests/ -v --tb=short
 
