@@ -200,12 +200,20 @@ Question: {scenario.get('user_prompt', '')}"""
 
                     # Store sample failures (max 5)
                     if len(sample_failures) < 5:
+                        # Show response length and content (truncate if needed)
+                        response_preview = response[:300] if len(response) > 300 else response
+                        if len(response) > 300:
+                            response_preview += "..."
+                        elif not response:
+                            response_preview = "[EMPTY RESPONSE]"
+                        
                         sample_failures.append({
                             "id": scenario_id,
                             "domain": domain,
                             "level": level,
-                            "prompt": prompt[:200] + "...",
-                            "response": response[:300] + "...",
+                            "prompt": prompt[:200] + ("..." if len(prompt) > 200 else ""),
+                            "response": response_preview,
+                            "response_length": len(response),
                             "expected": scenario.get("rubric", {}).get("context_success", "")[:200],
                             "reason": score.reason
                         })
