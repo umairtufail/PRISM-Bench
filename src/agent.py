@@ -305,16 +305,15 @@ Question: {scenario.get('user_prompt', '')}"""
                 summary += f"   • [{failure['id']}] {failure['reason'][:80]}...\n"
 
         # Add artifact with results in AgentBeats format
-        # The workflow will add the participants mapping from scenario.toml
-        # We output results as an array to match AgentBeats format
-        results_data = {
-            "results": [prism_result.model_dump()]
-        }
-        
+        # The workflow will:
+        # 1. Extract this data as a single result object
+        # 2. Wrap it with participants from scenario.toml
+        # 3. Put it in a results array: {"participants": {...}, "results": [this_data]}
+        # So we output just the PRISM result data directly
         await updater.add_artifact(
             parts=[
                 Part(root=TextPart(text=summary)),
-                Part(root=DataPart(data=results_data))
+                Part(root=DataPart(data=prism_result.model_dump()))
             ],
             name="PRISM Benchmark Results",
         )
