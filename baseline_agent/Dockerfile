@@ -14,7 +14,7 @@ RUN \
     uv sync --locked
 
 # The entrypoint accepts --host, --port, --card-url as required by AgentBeats
-ENTRYPOINT ["uv", "run", "baseline_agent/agent.py"]
+ENTRYPOINT ["uv", "run", "python", "baseline_agent/agent.py"]
 CMD ["--host", "0.0.0.0"]
 EXPOSE 9019
 
