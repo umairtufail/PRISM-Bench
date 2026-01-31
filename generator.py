@@ -11,8 +11,8 @@ from google.genai import types
 # --- CONFIGURATION ---
 API_KEY = os.getenv("GOOGLE_API_KEY", os.getenv("GEMINI_API_KEY", "YOUR_API_KEY"))
 
-# GEMINI 3 PRO PREVIEW - 65k output token limit
-MODEL_NAME = "gemini-3-pro-preview"
+# GEMINI 2.5 FLASH - Fast and efficient for scenario generation
+MODEL_NAME = "gemini-2.5-flash"
 
 OUTPUT_FILE = "gem_bench_complete_320.jsonl"
 
