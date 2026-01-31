@@ -16,7 +16,8 @@ import argparse
 import uvicorn
 from dotenv import load_dotenv
 
-from google import genai
+from groq import Groq
+GROQ_AVAILABLE = True
 from a2a.server.apps import A2AStarletteApplication
 from a2a.server.request_handlers import DefaultRequestHandler
 from a2a.server.agent_execution import AgentExecutor, RequestContext
@@ -40,26 +41,37 @@ class BaselineAgent:
     """A simple LLM agent without cultural awareness training."""
 
     def __init__(self):
-        api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
-        if not api_key:
-            raise ValueError("GOOGLE_API_KEY or GEMINI_API_KEY required")
-        self.client = genai.Client(api_key=api_key)
-        self.model = "gemini-2.5-flash"
+        # Use Groq with GPT-OSS-120B
+        groq_key = os.getenv("GROQ_API_KEY")
+        
+        if not groq_key:
+            raise ValueError("GROQ_API_KEY environment variable required")
+        
+        if not GROQ_AVAILABLE:
+            raise ValueError("groq package is required. Install with: pip install groq")
+        
+        self.client = Groq(api_key=groq_key)
+        self.model = "openai/gpt-oss-120b"  # GPT-OSS-120B for baseline agent
+        self.provider = "groq"
 
     async def respond(self, message: str) -> str:
         """Generate a response using basic LLM without cultural prompting."""
         system_prompt = """You are a helpful AI assistant. Answer questions directly and concisely.
 Provide practical advice based on common knowledge and best practices."""
 
-        response = self.client.models.generate_content(
+        response = self.client.chat.completions.create(
             model=self.model,
-            config=genai.types.GenerateContentConfig(
-                system_instruction=system_prompt,
-                temperature=0.7,
-            ),
-            contents=message,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": message}
+            ],
+            temperature=1,
+            max_completion_tokens=8192,
+            top_p=1,
+            reasoning_effort="medium",
+            stream=False,
         )
-        return response.text
+        return response.choices[0].message.content or ""
 
 
 class BaselineExecutor(AgentExecutor):
