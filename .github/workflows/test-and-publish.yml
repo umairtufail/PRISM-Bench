@@ -1,4 +1,4 @@
-name: Build and Publish Agent
+name: Build and Publish Agents
 
 on:
   push:
@@ -10,6 +10,18 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          # Green agent (PRISM evaluator)
+          - name: prism-bench
+            dockerfile: Dockerfile
+            port: 9009
+          # Purple agent (baseline)
+          - name: prism-baseline
+            dockerfile: baseline_agent/Dockerfile
+            port: 9019
 
     # These permissions are required for the workflow to:
     # - Read repository contents (checkout code)
@@ -36,7 +48,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository }}
+          images: ghcr.io/${{ github.repository }}-${{ matrix.name }}
           tags: |
             # For tags like v1.0, create tag '1.0'
             type=semver,pattern={{version}}
@@ -47,11 +59,12 @@ jobs:
             # For PRs, create tag 'pr-123'
             type=ref,event=pr
 
-      - name: Build and push Docker image
+      - name: Build and push Docker image (${{ matrix.name }})
         id: build
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: ${{ matrix.dockerfile }}
           # Only push if this is a push event (not a PR)
           # PRs will build but not push to avoid polluting the registry
           push: ${{ github.event_name != 'pull_request' }}
@@ -65,12 +78,14 @@ jobs:
       - name: Output image digest
         if: github.event_name != 'pull_request'
         run: |
-          echo "## Docker Image Published :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "## Docker Image Published: ${{ matrix.name }} :rocket:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Tags:** ${{ steps.meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Digest:** \`${{ steps.build.outputs.digest }}\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Image:** \`ghcr.io/${{ github.repository }}:latest\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Image:** \`ghcr.io/${{ github.repository }}-${{ matrix.name }}:latest\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Port:** ${{ matrix.port }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Use this digest in your MANIFEST.json for reproducibility." >> $GITHUB_STEP_SUMMARY

@@ -1,5 +1,5 @@
 # AgentBeats Integration
 # GitHub Actions configured
 # API key secret added
-# Docker image: ghcr.io/umairtufail/prism-bench:latest
+# Docker registry-1.docker.io/umairtufail/prism-bench:latest
 # Webhook configured for automatic leaderboard updates
