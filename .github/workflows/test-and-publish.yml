@@ -44,7 +44,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: docker.io/umairtufail/${{ matrix.name }}
+          images: registry-1.docker.io/umairtufail/${{ matrix.name }}
           tags: |
             type=ref,event=tag
             type=semver,pattern={{version}}
@@ -74,6 +74,6 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Digest:** \`${{ steps.build.outputs.digest }\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Image:** \`docker.io/umairtufail/${{ matrix.name }}:latest\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Image:** \`registry-1.docker.io/umairtufail/${{ matrix.name }}:latest\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Port:** ${{ matrix.port }}" >> $GITHUB_STEP_SUMMARY
