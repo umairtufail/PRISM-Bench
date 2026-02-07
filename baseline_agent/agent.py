@@ -1,5 +1,5 @@
 """
-PRISM Baseline Purple Agent
+PRISM Baseline  Agent
 
 A simple agent that demonstrates how to be evaluated by PRISM.
 This agent uses a basic LLM without any cultural awareness training,

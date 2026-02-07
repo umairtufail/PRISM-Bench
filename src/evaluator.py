@@ -1,7 +1,7 @@
 """
 PRISM Evaluator: LLM-as-Judge for Cultural Intelligence assessment.
 
-Uses Groq (Kimi K2) to evaluate responses against
+Uses Kimi K2 to evaluate responses against
 the PGAF framework (Pluralistic & Granular Alignment Framework).
 """
 

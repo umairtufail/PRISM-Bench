@@ -1,5 +1,5 @@
 """
-PRISM Chain-of-Thought Baseline Purple Agent
+PRISM Chain-of-Thought Baseline  Agent
 
 A baseline agent with explicit reasoning steps for cultural analysis.
 Expected to score ~75-85% on PRISM benchmark.
@@ -11,7 +11,7 @@ import argparse
 import uvicorn
 from dotenv import load_dotenv
 
-from google import genai
+from groq import Groq
 from a2a.server.apps import A2AStarletteApplication
 from a2a.server.request_handlers import DefaultRequestHandler
 from a2a.server.agent_execution import AgentExecutor, RequestContext
@@ -35,11 +35,11 @@ class CoTAgent:
     """An agent with chain-of-thought reasoning for cultural intelligence."""
 
     def __init__(self):
-        api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
-        if not api_key:
-            raise ValueError("GOOGLE_API_KEY or GEMINI_API_KEY required")
-        self.client = genai.Client(api_key=api_key)
-        self.model = "gemini-2.5-flash"
+        groq_key = os.getenv("GROQ_API_KEY")
+        if not groq_key:
+            raise ValueError("GROQ_API_KEY environment variable required")
+        self.client = Groq(api_key=groq_key)
+        self.model = "openai/gpt-oss-120b"  # GPT-OSS-120B via Groq
 
     async def respond(self, message: str) -> str:
         """Generate a response with structured cultural reasoning."""
@@ -63,15 +63,19 @@ STEP 3 - Response Formulation:
 
 Always show your reasoning briefly, then provide the final recommendation."""
 
-        response = self.client.models.generate_content(
+        response = self.client.chat.completions.create(
             model=self.model,
-            config=genai.types.GenerateContentConfig(
-                system_instruction=system_prompt,
-                temperature=0.7,
-            ),
-            contents=message,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": message}
+            ],
+            temperature=0.7,
+            max_completion_tokens=8192,
+            top_p=1,
+            reasoning_effort="medium",
+            stream=False,
         )
-        return response.text
+        return response.choices[0].message.content or ""
 
 
 class CoTExecutor(AgentExecutor):
