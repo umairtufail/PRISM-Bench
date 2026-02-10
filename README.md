@@ -335,31 +335,6 @@ done
 
 ---
 
-## 🚀 Submission to AgentBeats
-
-### Quick Start
-1. **Generate final dataset**:
-   ```bash
-   python3 generator_v3_final.py
-   python3 generator_level3_retrofit.py
-   python3 merge_final.py
-   ```
-
-2. **Build Docker image**:
-   ```bash
-   docker build --platform linux/amd64 -t ghcr.io/yourusername/prism-bench:v1.0.0 .
-   docker push ghcr.io/yourusername/prism-bench:v1.0.0
-   ```
-
-3. **Submit to AgentBeats**:
-   - Go to https://agentbeats.dev
-   - Submit as Green Agent
-   - Docker image: `ghcr.io/yourusername/prism-bench:v1.0.0`
-
-See [SUBMISSION_GUIDE.md](SUBMISSION_GUIDE.md) for complete instructions.
-
----
-
 ## 📜 License
 
 MIT License - See [LICENSE](LICENSE) for details.
